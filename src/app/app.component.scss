@@ -1,0 +1,22 @@
+// Estilos básicos de la app
+
+ion-header {
+  ion-toolbar {
+    --background: #dc0a2d;
+    --color: white;
+    
+    ion-buttons {
+      ion-button {
+        --color: white;
+        
+        ion-icon {
+          font-size: 20px;
+        }
+      }
+    }
+    
+    ion-title {
+      font-weight: 600;
+    }
+  }
+}

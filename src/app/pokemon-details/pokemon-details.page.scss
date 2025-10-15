@@ -1,0 +1,909 @@
+ion-content {
+  --background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* Ocupa toda la pantalla */
+  flex-direction: column;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+ion-card {
+  margin: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  .pokemon-img {
+    width: 200px;
+    height: 200px;
+    margin: 1rem auto;
+    object-fit: contain;
+  }
+
+  ion-card-header {
+    text-align: center;
+    
+    ion-card-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    ion-card-subtitle {
+      font-size: 1.2rem;
+      color: #666;
+    }
+  }
+}
+
+.background-card {
+  display: block;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: fit-content;
+  max-width: 100%;
+  transition: all 0.3s ease;
+  text-align: center;
+  
+  // Estilos específicos para un solo tipo
+  &.single-type {
+    padding: 10px 20px;
+    border-radius: 30px;
+  }
+  
+  // Estilos específicos para dos tipos
+  &.dual-type {
+    padding: 12px 20px;
+    border-radius: 16px;
+  }
+  
+  // Estilos específicos para más de dos tipos
+  &.multi-type {
+    padding: 16px 24px;
+    border-radius: 12px;
+  }
+}
+
+.types-container {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0 auto;
+  width: fit-content;
+  flex-wrap: wrap;
+
+  ion-chip {
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+    padding: 6px 12px;
+    transition: transform 0.2s ease;
+    
+    &:hover {
+      transform: translateY(-2px);
+    }
+    
+    .type-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 6px;
+    }
+  }
+}
+
+.stats-container {
+  margin: 1.5rem 0;
+
+  .stat-item {
+    margin: 0.5rem 0;
+
+    .stat-label {
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+      color: #333;
+    }
+
+    .stat-bar {
+      background-color: #eee;
+      border-radius: 0.5rem;
+      height: 1.5rem;
+      overflow: hidden;
+
+      .stat-fill {
+        height: 100%;
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0 0.5rem;
+        font-size: 0.9rem;
+        font-weight: bold;
+        transition: width 0.3s ease;
+      }
+    }
+  }
+}
+
+.info-section, .abilities-section, .sprites-section {
+  margin: 1.5rem 0;
+
+  h3 {
+    color: #333;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.abilities-section,
+.moves-section {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px auto;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  h3 {
+    color: #333;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+  }
+  
+  .ability-item, .move-item {
+    width: 100%;
+    margin-bottom: 12px;
+    
+    .ability-chip {
+      width: 100%;
+      justify-content: space-between;
+      margin: 0;
+      cursor: pointer;
+      
+      ion-icon {
+        margin-left: 10px;
+      }
+    }
+    
+    .ability-details {
+      padding: 12px;
+      margin-top: 8px;
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 8px;
+      width: 100%;
+      text-align: center;
+      
+      .ability-description {
+        margin: 0;
+        color: #333;
+        font-size: 0.95rem;
+        line-height: 1.4;
+      }
+    }
+  }
+  
+  .moves-list {
+    width: 100%;
+    
+    .move-item {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 12px;
+      
+      .move-header {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin-bottom: 8px;
+        
+        .move-type {
+          margin-right: 8px;
+          margin-bottom: 4px;
+          color: white;
+          font-weight: 500;
+        }
+        
+        .move-name {
+          margin: 0;
+          font-size: 1rem;
+          font-weight: 600;
+          color: #333;
+        }
+      }
+      
+      .move-stats {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 8px;
+        
+        .move-stat {
+          display: flex;
+          align-items: center;
+          font-size: 0.9rem;
+          color: #555;
+          
+          ion-icon {
+            margin-right: 4px;
+            font-size: 1rem;
+          }
+          
+          &.damage-class {
+            border-radius: 4px;
+            padding: 2px 6px;
+            background-color: #f0f0f0;
+            font-weight: 500;
+          }
+        }
+      }
+      
+      .move-description {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #666;
+        text-align: center;
+      }
+    }
+  }
+}
+
+.sprites-section {
+  .sprite-card {
+    margin: 0.5rem;
+    text-align: center;
+
+    ion-img {
+      padding: 0.5rem;
+      background-color: rgba(255, 255, 255, 0.8);
+    }
+
+    ion-card-subtitle {
+      padding: 0.5rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+ion-button {
+  --background: #ffeb3b;
+  --color: #d32f2f;
+  font-weight: bold;
+  border-radius: 12px;
+  padding: 12px 20px;
+  margin-top: 10px;
+}
+
+ion-button:hover {
+  filter: brightness(0.9);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.evolution-chain {
+  margin: 2rem 0;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 1rem;
+
+  h3 {
+    color: #333;
+    font-size: 1.2rem;
+    margin: 1.5rem 0;
+    text-align: center;
+    
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  .evolution-stages {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+
+    .evolution-stage {
+      flex: 1;
+      min-width: 120px;
+      max-width: 200px;
+    }
+
+    .evolution-arrow {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      padding: 0 1rem;
+
+      ion-icon {
+        font-size: 24px;
+      }
+    }
+
+    .pokemon-evolution {
+      background: rgba(255, 255, 255, 0.5);
+      border-radius: 1rem;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+
+      &.current {
+        border-color: #333;
+        background: rgba(255, 255, 255, 0.8);
+        transform: scale(1.05);
+      }
+
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      img {
+        width: 80px;
+        height: 80px;
+        object-fit: contain;
+        margin-bottom: 0.5rem;
+      }
+
+      h4 {
+        margin: 0.5rem 0;
+        color: #333;
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      .evolution-number {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 0;
+      }
+    }
+  }
+
+  .variant-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  .variant-card {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      margin-bottom: 0.5rem;
+    }
+
+    h4 {
+      margin: 0.5rem 0;
+      color: #333;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .variant-number {
+      color: #666;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+  }
+
+  .mega-evolutions, .gigamax-form {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+.evolution-detail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+
+  .evolution-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    margin: 0 10px;
+
+    ion-icon {
+      font-size: 24px;
+    }
+  }
+
+  .evolution-condition {
+    background-color: rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 4px 12px;
+    font-size: 0.8rem;
+    color: #333;
+    text-align: center;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin: 0 10px;
+  }
+}
+
+@media (max-width: 768px) {
+  .evolution-chain {
+    .evolution-stages {
+      flex-direction: column;
+      
+      .evolution-detail {
+        flex-direction: row;
+        width: 100%;
+        justify-content: center;
+        
+        .evolution-arrow {
+          transform: rotate(90deg);
+        }
+      }
+
+      .evolution-stage {
+        width: 100%;
+        max-width: none;
+      }
+    }
+
+    .variant-grid {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    }
+
+    .variant-card {
+      img {
+        width: 100px;
+        height: 100px;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .evolution-chain {
+    padding: 0.5rem;
+
+    .variant-grid {
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .variant-card {
+      padding: 0.5rem;
+
+      img {
+        width: 80px;
+        height: 80px;
+      }
+
+      h4 {
+        font-size: 0.9rem;
+      }
+
+      .variant-number {
+        font-size: 0.8rem;
+      }
+    }
+  }
+}
+
+/* Estilos para la sección de debilidades */
+.weaknesses-section {
+  margin: 20px 0;
+  padding: 16px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+  h3 {
+    color: #333;
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+    font-weight: 600;
+  }
+
+  .weaknesses-group {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .weaknesses-title {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 8px;
+      padding-left: 4px;
+      border-left: 3px solid #dc0a2d;
+    }
+
+    .type-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      
+      ion-chip {
+        margin: 0;
+        color: white;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        padding: 6px 12px;
+        border-radius: 16px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        
+        .type-icon {
+          width: 20px;
+          height: 20px;
+          margin-right: 6px;
+          filter: none;
+        }
+      }
+    }
+  }
+}
+
+// Estilos para hacer los tipos claramente clickeables
+.types-container ion-chip,
+.type-chips ion-chip {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  &:active {
+    transform: translateY(0);
+    opacity: 0.8;
+  }
+}
+
+.variant-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  
+  img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    margin-right: 12px;
+  }
+  
+  .variant-title {
+    flex: 1;
+    
+    h4 {
+      margin: 0 0 4px 0;
+      font-size: 1.2rem;
+      color: #333;
+      font-weight: 600;
+    }
+    
+    .variant-number {
+      margin: 0;
+      color: #666;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.variant-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+  
+  ion-chip {
+    margin: 0;
+    color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+    
+    .type-icon {
+      width: 18px;
+      height: 18px;
+      margin-right: 4px;
+    }
+  }
+}
+
+.evolution-method {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.05);
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  
+  ion-icon {
+    margin-right: 8px;
+    font-size: 1.2rem;
+    color: #d32f2f;
+  }
+  
+  span {
+    font-size: 0.9rem;
+    color: #333;
+    font-weight: 500;
+  }
+}
+
+.variant-stats {
+  margin-bottom: 16px;
+  
+  .stat-mini {
+    margin-bottom: 6px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .stat-name {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: #555;
+      margin-bottom: 2px;
+    }
+    
+    .stat-bar-mini {
+      height: 12px;
+      background-color: #eee;
+      border-radius: 6px;
+      overflow: hidden;
+      
+      .stat-fill {
+        height: 100%;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 4px;
+        color: white;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.variant-abilities {
+  h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 8px 0;
+  }
+  
+  .variant-ability {
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 8px;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    .ability-name {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+    
+    .ability-description {
+      font-size: 0.8rem;
+      color: #555;
+      line-height: 1.3;
+    }
+  }
+}
+
+.variant-card {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 1rem;
+  padding: 1rem;
+  text-align: left;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+}
+
+.single-mega {
+  display: block;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.single-variant {
+  width: 100%;
+  text-align: center;
+}
+
+.centered-header {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  
+  .single-title {
+    width: 100%;
+    margin-bottom: 12px;
+    text-align: center;
+    
+    h4 {
+      font-size: 1.4rem;
+      margin-bottom: 8px;
+    }
+    
+    .variant-number {
+      font-size: 1rem;
+    }
+  }
+  
+  .centered-image {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 20px;
+  }
+}
+
+.background-card-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.moves-section {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  
+  h3 {
+    color: #333;
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: 600;
+  }
+  
+  .moves-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+    
+    .move-item {
+      background: rgba(255, 255, 255, 0.6);
+      border-radius: 10px;
+      padding: 15px;
+      width: 100%;
+      max-width: 700px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      
+      .move-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 12px;
+        
+        .move-type {
+          display: flex;
+          align-items: center;
+          padding: 5px 12px;
+          border-radius: 20px;
+          color: white;
+          font-weight: 500;
+          
+          .type-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 6px;
+          }
+        }
+        
+        .move-name {
+          margin: 0;
+          font-size: 1.2rem;
+          font-weight: 600;
+          color: #333;
+        }
+      }
+      
+      .move-stats {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 12px;
+        
+        .move-stat {
+          display: flex;
+          align-items: center;
+          font-size: 0.9rem;
+          color: #555;
+          background: rgba(255, 255, 255, 0.7);
+          padding: 4px 10px;
+          border-radius: 15px;
+          
+          ion-icon {
+            margin-right: 5px;
+            font-size: 16px;
+          }
+          
+          &.damage-class {
+            font-weight: 500;
+          }
+        }
+      }
+      
+      .move-description {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.4;
+        color: #444;
+        text-align: center;
+      }
+    }
+  }
+}

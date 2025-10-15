@@ -1,0 +1,39 @@
+ion-header {
+  ion-toolbar {
+    --background: #dc0a2d;
+    --color: white;
+  }
+}
+
+.confirm-message {
+  text-align: center;
+  margin: 20px 0;
+  
+  p {
+    font-size: 1.1rem;
+    color: #333;
+    line-height: 1.5;
+  }
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+  
+  ion-button {
+    --border-radius: 8px;
+    --padding-start: 24px;
+    --padding-end: 24px;
+    
+    &:first-child {
+      --color: #666;
+      --border-color: #ccc;
+    }
+    
+    &:last-child {
+      --background: #dc0a2d;
+    }
+  }
+} 

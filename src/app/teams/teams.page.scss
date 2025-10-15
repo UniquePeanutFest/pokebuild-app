@@ -1,0 +1,370 @@
+ion-header {
+  ion-toolbar {
+    --background: #dc0a2d;
+    --color: white;
+  }
+}
+
+ion-content {
+  --padding-top: 16px;
+  --padding-bottom: 16px;
+  --background: #f5f5f5;
+  
+  h2 {
+    color: #333;
+    margin-bottom: 16px;
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+  
+  p {
+    color: #666;
+    margin-bottom: 24px;
+  }
+  
+  ion-card {
+    border-radius: 12px;
+    margin: 16px 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    
+    ion-card-header {
+      background-color: #f8f8f8;
+    }
+    
+    ion-card-title {
+      font-size: 1.2rem;
+      color: #333;
+    }
+    
+    ion-card-content {
+      padding: 16px;
+      font-size: 1rem;
+      color: #666;
+    }
+  }
+}
+
+.loading-container,
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60vh;
+  text-align: center;
+  
+  ion-spinner,
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: var(--ion-color-primary);
+  }
+  
+  ion-icon {
+    font-size: 64px;
+    color: var(--ion-color-danger);
+  }
+  
+  p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 24px;
+  }
+}
+
+.teams-container {
+  padding-bottom: 80px;
+  
+  .teams-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+    
+    h2 {
+      color: #333;
+      font-size: 1.5rem;
+      margin: 0;
+      font-weight: 600;
+    }
+    
+    .team-count-badge {
+      background-color: var(--ion-color-primary);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+  }
+  
+  .teams-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    
+    .team-card {
+      display: flex;
+      flex-direction: column;
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
+      
+      .team-image {
+        width: 100%;
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f5f5f5;
+        overflow: hidden;
+        position: relative;
+        padding: 12px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        
+        img {
+          max-width: 90%;
+          max-height: 90%;
+          object-fit: contain;
+          display: block;
+          margin: 0 auto;
+          filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+          transition: transform 0.3s ease;
+        }
+      }
+      
+      .team-info {
+        padding: 16px;
+        position: relative;
+        
+        h3 {
+          margin: 0 0 8px 0;
+          font-size: 1.2rem;
+          color: #333;
+          font-weight: 600;
+        }
+        
+        .team-meta {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 12px;
+          
+          .team-count {
+            background-color: #f5f5f5;
+            color: #666;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            
+            &.team-complete {
+              background-color: #4caf50;
+              color: white;
+            }
+          }
+          
+          .team-date {
+            font-size: 0.8rem;
+            color: #999;
+          }
+        }
+        
+        .game-mode-badge {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+          font-size: 0.8rem;
+          padding: 4px 8px;
+          border-radius: 4px;
+        }
+      }
+    }
+  }
+}
+
+.empty-teams {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin: 20px 0;
+  
+  ion-icon {
+    font-size: 64px;
+    color: #ccc;
+    margin-bottom: 20px;
+  }
+  
+  h3 {
+    color: #333;
+    font-size: 1.4rem;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+  }
+  
+  p {
+    color: #666;
+    margin: 0 0 24px 0;
+    font-size: 1rem;
+  }
+  
+  ion-button {
+    max-width: 240px;
+    margin: 0 auto;
+  }
+}
+
+/* Estilos para pantallas más pequeñas */
+@media (max-width: 576px) {
+  .teams-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .team-image {
+    height: 120px !important;
+    
+    img {
+      width: 100px !important;
+      height: 100px !important;
+    }
+  }
+  
+  .teams-header h2 {
+    font-size: 1.3rem !important;
+  }
+}
+
+/* Estilos para el botón flotante */
+ion-fab {
+  margin-bottom: 20px;
+  margin-right: 20px;
+  
+  ion-fab-button {
+    --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.team-card {
+  animation: fadeIn 0.3s ease-out;
+  animation-fill-mode: both;
+}
+
+.team-card:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.team-card:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.team-card:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.team-card:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+.team-card:nth-child(6) {
+  animation-delay: 0.5s;
+}
+
+.team-tip {
+  background-color: rgba(0, 0, 0, 0.05);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #777;
+  
+  ion-icon {
+    font-size: 16px;
+    margin-right: 6px;
+    color: #666;
+  }
+}
+
+.context-menu {
+  position: fixed;
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 200px;
+  animation: fadeIn 0.2s ease;
+  overflow: hidden;
+  
+  .menu-item {
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 16px;
+    
+    &:hover {
+      background-color: #f5f5f5;
+    }
+    
+    &:active {
+      background-color: #eaeaea;
+    }
+    
+    ion-icon {
+      margin-right: 12px;
+      font-size: 20px;
+      color: #333;
+    }
+    
+    &.delete {
+      color: #dc3545;
+      
+      ion-icon {
+        color: #dc3545;
+      }
+      
+      &:hover {
+        background-color: rgba(220, 53, 69, 0.1);
+      }
+      
+      &:active {
+        background-color: rgba(220, 53, 69, 0.2);
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+} 

@@ -1,0 +1,409 @@
+ion-header {
+  ion-toolbar {
+    --background: #dc0a2d;
+    --color: white;
+  }
+}
+
+.search-container {
+  padding: 12px;
+  background-color: #f5f5f5;
+  
+  ion-searchbar {
+    --background: #fff;
+    --border-radius: 8px;
+    --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    --placeholder-opacity: 0.7;
+    --placeholder-color: #777;
+    
+    &.active-filter {
+      --background: rgba(220, 10, 45, 0.05);
+      --border-color: #dc0a2d;
+    }
+  }
+}
+
+.active-filters-indicator {
+  background-color: #f9f9f9;
+  padding: 12px;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  
+  ion-badge {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    border-radius: 16px;
+    
+    ion-icon {
+      margin-right: 6px;
+    }
+  }
+  
+  .active-types, .active-generation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+    
+    ion-chip {
+      margin: 0;
+      height: 28px;
+      border-radius: 14px;
+      
+      .type-icon-small {
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+      }
+      
+      &.generation-chip {
+        --background: #3880ff;
+        --color: white;
+        
+        ion-icon {
+          margin-right: 4px;
+          &:last-child {
+            margin-right: 0;
+            margin-left: 4px;
+          }
+        }
+      }
+    }
+  }
+  
+  .clear-all-btn {
+    margin-left: auto;
+    --border-color: #dc0a2d;
+    --color: #dc0a2d;
+    font-size: 12px;
+  }
+}
+
+.filters-tabs-container {
+  background-color: #fff;
+  margin-bottom: 10px;
+  
+  ion-segment {
+    --background: #f5f5f5;
+    padding: 5px;
+    
+    ion-segment-button {
+      --color: #666;
+      --color-checked: #dc0a2d;
+      --indicator-color: #dc0a2d;
+      --border-radius: 4px;
+      min-height: 40px;
+      
+      ion-icon {
+        margin-bottom: 2px;
+      }
+      
+      ion-label {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+.filter-container {
+  padding: 12px;
+  
+  .filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    
+    h4 {
+      margin: 0;
+      color: #333;
+      font-size: 16px;
+      font-weight: 500;
+    }
+    
+    ion-button {
+      --color: #666;
+      font-size: 12px;
+      --padding-start: 8px;
+      --padding-end: 8px;
+    }
+  }
+  
+  .type-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 8px;
+    
+    .type-chip {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 4px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+      
+      &.selected {
+        box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+        transform: scale(0.95);
+      }
+      
+      &:hover {
+        transform: translateY(-2px);
+      }
+      
+      .type-icon {
+        width: 24px;
+        height: 24px;
+        margin-bottom: 4px;
+      }
+      
+      .type-name {
+        color: white;
+        font-size: 12px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        text-align: center;
+      }
+    }
+  }
+  
+  .generation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+    
+    .generation-card {
+      background-color: #f5f5f5;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: 2px solid transparent;
+      
+      &.selected {
+        background-color: rgba(56, 128, 255, 0.1);
+        border-color: #3880ff;
+      }
+      
+      &:hover {
+        transform: translateY(-2px);
+        background-color: #eee;
+      }
+      
+      .generation-info {
+        display: flex;
+        flex-direction: column;
+        
+        .generation-name {
+          font-weight: 600;
+          font-size: 14px;
+          color: #333;
+          margin-bottom: 4px;
+        }
+        
+        .generation-region {
+          font-size: 12px;
+          color: #666;
+          margin-bottom: 2px;
+        }
+        
+        .generation-range {
+          font-size: 11px;
+          color: #888;
+        }
+      }
+    }
+  }
+}
+
+.results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background-color: #f5f5f5;
+  border-top: 1px solid #eee;
+  
+  h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+  }
+}
+
+.pokemon-grid-container {
+  background-color: #fff;
+  padding: 10px;
+  
+  .pokemon-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    
+    .pokemon-card {
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      }
+      
+      &.selected {
+        opacity: 0.6;
+        transform: none;
+        
+        &:hover {
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+      }
+      
+      &.disabled {
+        pointer-events: none;
+      }
+      
+      .pokemon-card-content {
+        position: relative;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        
+        .pokemon-id {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          font-size: 12px;
+          background-color: rgba(0, 0, 0, 0.05);
+          padding: 2px 6px;
+          border-radius: 10px;
+          color: #888;
+          font-weight: 500;
+        }
+        
+        .pokemon-image {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 100px;
+          margin-bottom: 10px;
+          
+          img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+          }
+        }
+        
+        .pokemon-info {
+          h3 {
+            margin: 0 0 6px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+          }
+          
+          .pokemon-types {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            
+            ion-badge {
+              display: flex;
+              align-items: center;
+              padding: 4px 8px;
+              border-radius: 4px;
+              
+              .type-icon-mini {
+                width: 12px;
+                height: 12px;
+                margin-right: 4px;
+              }
+            }
+          }
+          
+          .pokemon-forms {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            
+            ion-badge {
+              display: flex;
+              align-items: center;
+              font-size: 10px;
+              padding: 3px 6px;
+              
+              ion-icon {
+                margin-right: 3px;
+                font-size: 12px;
+              }
+            }
+          }
+        }
+        
+        .selected-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: white;
+          
+          ion-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+          }
+          
+          span {
+            font-size: 12px;
+            font-weight: 500;
+          }
+        }
+      }
+    }
+  }
+}
+
+.loading-container,
+.error-container,
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 20px;
+  text-align: center;
+  color: #666;
+  
+  ion-icon {
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+  
+  p {
+    margin: 0 0 16px;
+    font-size: 16px;
+  }
+  
+  ion-spinner {
+    margin-bottom: 16px;
+    color: #dc0a2d;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+} 

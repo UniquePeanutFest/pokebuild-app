@@ -1,0 +1,390 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="goToTeams()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title *ngIf="!isEditing && team">{{ team.name }}</ion-title>
+    <div class="edit-title" *ngIf="isEditing && team">
+      <ion-input 
+        [(ngModel)]="editingName" 
+        placeholder="Nombre del equipo"
+        maxlength="30">
+      </ion-input>
+      <ion-button (click)="saveTeamName()" [disabled]="!editingName.trim()">
+        <ion-icon name="checkmark"></ion-icon>
+      </ion-button>
+      <ion-button (click)="cancelEditTeamName()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </div>
+    <ion-buttons slot="end" *ngIf="!isEditing && team">
+      <ion-button (click)="goToHomePage()" class="home-button">
+        <ion-icon name="home"></ion-icon>
+      </ion-button>
+      <ion-button (click)="editTeamName()">
+        <ion-icon name="create-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="confirmDeleteTeam()">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <h2>Cargando equipo...</h2>
+  </div>
+  
+  <div class="error-container" *ngIf="error">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <h2>{{ error }}</h2>
+    <ion-button (click)="goToTeams()">
+      Volver a equipos
+    </ion-button>
+  </div>
+  
+  <div class="team-content" *ngIf="team && !isLoading && !error">
+    <!-- Sección de Pokémon del equipo -->
+    <div class="pokemon-section" *ngIf="team">
+      <h2>{{ team.name }} <span class="game-mode-badge" [class.pve]="gameMode === 'pve'" [class.pvp]="gameMode === 'pvp'">{{gameMode === 'pve' ? 'PvE' : 'PvP'}}</span></h2>
+      
+      <!-- Control de modo de juego -->
+      <div class="game-mode-selector">
+        <ion-segment [(ngModel)]="gameMode" (ionChange)="updateGameMode()">
+          <ion-segment-button value="pve" class="mode-pve">
+            <ion-label>PvE</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="pvp" class="mode-pvp">
+            <ion-label>PvP</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+      </div>
+      
+      <!-- Grid de slots de Pokémon -->
+      <div class="pokemon-slots-grid">
+        <!-- Pokémon en el equipo -->
+        <div *ngFor="let teamPokemon of team.pokemons" class="pokemon-card" [class.recently-added]="recentlyAddedPokemon?.id === teamPokemon.pokemon.id">
+          <div class="card-header">
+            <span class="pokemon-name">{{ getPokemonDisplayName(teamPokemon) }}</span>
+            <ion-button fill="clear" (click)="$event.stopPropagation(); confirmRemovePokemon(teamPokemon.pokemon)" class="remove-btn">
+              <ion-icon name="close-circle"></ion-icon>
+            </ion-button>
+          </div>
+          
+          <div class="pokemon-content">
+            <div class="pokemon-image">
+              <img [src]="getPokemonImageUrl(teamPokemon)" [alt]="teamPokemon.pokemon.name">
+            </div>
+            
+            <div class="pokemon-info">
+              <div class="pokemon-types" 
+                   [class.single-type]="getPokemonTypes(teamPokemon).length === 1"
+                   [class.dual-type]="getPokemonTypes(teamPokemon).length === 2"
+                   [class.multi-type]="getPokemonTypes(teamPokemon).length > 2">
+                <div *ngFor="let type of getPokemonTypes(teamPokemon)" class="type-badge"
+                     [style.background-color]="getTypeColor(type.type.name)">
+                  <img src="assets/elements/{{type.type.name}}.png" alt="{{type.type.name}}" class="type-icon">
+                  <span>{{ type.type.name | titlecase }}</span>
+                </div>
+              </div>
+              
+              <div class="pokemon-role" *ngIf="teamPokemon.role">
+                <span class="role-label">Rol:</span>
+                <span class="role-value">{{ teamPokemon.role }}</span>
+              </div>
+              
+              <div class="pokemon-stats">
+                <div class="stat-row">
+                  <span class="stat-label">HP:</span>
+                  <span class="stat-value">{{ getPokemonStat(teamPokemon, 'hp') }}</span>
+                  <div class="stat-bar">
+                    <div class="stat-fill" [style.width.%]="getPokemonStat(teamPokemon, 'hp') / 2.55"></div>
+                  </div>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Atk:</span>
+                  <span class="stat-value">{{ getPokemonStat(teamPokemon, 'attack') }}</span>
+                  <div class="stat-bar">
+                    <div class="stat-fill" [style.width.%]="getPokemonStat(teamPokemon, 'attack') / 2.55"></div>
+                  </div>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Def:</span>
+                  <span class="stat-value">{{ getPokemonStat(teamPokemon, 'defense') }}</span>
+                  <div class="stat-bar">
+                    <div class="stat-fill" [style.width.%]="getPokemonStat(teamPokemon, 'defense') / 2.55"></div>
+                  </div>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Sp.Atk:</span>
+                  <span class="stat-value">{{ getPokemonStat(teamPokemon, 'special-attack') }}</span>
+                  <div class="stat-bar">
+                    <div class="stat-fill" [style.width.%]="getPokemonStat(teamPokemon, 'special-attack') / 2.55"></div>
+                  </div>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Sp.Def:</span>
+                  <span class="stat-value">{{ getPokemonStat(teamPokemon, 'special-defense') }}</span>
+                  <div class="stat-bar">
+                    <div class="stat-fill" [style.width.%]="getPokemonStat(teamPokemon, 'special-defense') / 2.55"></div>
+                  </div>
+                </div>
+                <div class="stat-row">
+                  <span class="stat-label">Spd:</span>
+                  <span class="stat-value">{{ getPokemonStat(teamPokemon, 'speed') }}</span>
+                  <div class="stat-bar">
+                    <div class="stat-fill" [style.width.%]="getPokemonStat(teamPokemon, 'speed') / 2.55"></div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Mostrar el objeto asignado si existe -->
+              <div class="item-info" *ngIf="teamPokemon.pokemon.item">
+                <span class="item-label">Item:</span>
+                <div class="item-content">
+                  <img [src]="teamPokemon.pokemon.item.sprites.default" class="item-icon" *ngIf="teamPokemon.pokemon.item.sprites?.default">
+                  <span class="item-name">{{ pokemonService.getItemName(teamPokemon.pokemon.item) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Botón para añadir objeto -->
+          <ion-button class="add-item-button" expand="block" fill="clear" (click)="openItemSelectorModal(teamPokemon.pokemon)" *ngIf="!teamPokemon.pokemon.item">
+            <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+            <span>Añadir Item</span>
+          </ion-button>
+          
+          <!-- Botón para cambiar objeto si ya existe -->
+          <ion-button class="change-item-button" expand="block" fill="clear" (click)="openItemSelectorModal(teamPokemon.pokemon)" *ngIf="teamPokemon.pokemon.item">
+            <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
+            <span>Cambiar Item</span>
+          </ion-button>
+        </div>
+        
+        <!-- Slots vacíos -->
+        <div *ngFor="let slot of emptySlots" class="empty-slot" (click)="openPokemonSelector()">
+          <div class="plus-icon">+</div>
+          <div class="slot-text">Añadir Pokémon</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Puntuación de Balance del Equipo -->
+    <div class="balance-meter" *ngIf="analysis">
+      <h3>Balance del equipo</h3>
+      <div class="meter-container">
+        <div class="meter">
+          <div class="meter-fill" [style.width.%]="analysis.balanceScore * 10"></div>
+        </div>
+        <div class="meter-rating">{{ analysis.balanceScore }}/10</div>
+      </div>
+      
+      <div class="balance-rating-text">
+        <span *ngIf="analysis.balanceScore < 4">Tu equipo necesita mayor equilibrio</span>
+        <span *ngIf="analysis.balanceScore >= 4 && analysis.balanceScore < 7">Tu equipo es moderadamente equilibrado</span>
+        <span *ngIf="analysis.balanceScore >= 7">Tu equipo está bien equilibrado</span>
+      </div>
+    </div>
+    
+    <!-- Análisis del Equipo -->
+    <div class="analysis-container" *ngIf="analysis">
+      <!-- Distribución de Tipos -->
+      <div class="analysis-card">
+        <h3>Distribución de Tipos</h3>
+        <div class="type-distribution" *ngIf="Object.keys(analysis.typeCount).length > 0">
+          <div class="type-entry" *ngFor="let entry of typeSortedEntries(analysis.typeCount)">
+            <div class="type-badge" [style.background-color]="getTypeColor(entry[0])">
+              <img [src]="'assets/elements/' + entry[0] + '.png'" [alt]="entry[0]">
+              {{ entry[0] | titlecase }}
+            </div>
+            <div class="type-count">{{ entry[1] }}</div>
+          </div>
+        </div>
+        <div class="no-data" *ngIf="Object.keys(analysis.typeCount).length === 0">
+          <p>Añade Pokémon a tu equipo para ver la distribución de tipos.</p>
+        </div>
+      </div>
+      
+      <!-- Roles en el Equipo -->
+      <div class="analysis-card">
+        <h3>Roles del Equipo</h3>
+        <div class="team-roles" *ngIf="analysis.pokemonAnalysis.length > 0">
+          <div class="role-entry" *ngFor="let entry of roleSortedEntries(analysis.teamRoles)">
+            <div class="role-name">{{ entry[0] }}</div>
+            <div class="role-count-bar">
+              <div class="role-count-fill" [style.width.%]="(entry[1] / team.pokemons.length) * 100"></div>
+              <span>{{ entry[1] }}</span>
+            </div>
+          </div>
+          
+          <div class="missing-roles" *ngIf="analysis.missingRoles.length > 0">
+            <h4>Roles faltantes:</h4>
+            <ul>
+              <li *ngFor="let role of analysis.missingRoles">{{ role }}</li>
+            </ul>
+          </div>
+        </div>
+        <div class="no-data" *ngIf="analysis.pokemonAnalysis.length === 0">
+          <p>Añade Pokémon a tu equipo para ver la distribución de roles.</p>
+        </div>
+      </div>
+      
+      <!-- Debilidades del Equipo -->
+      <div class="analysis-card">
+        <h3>Debilidades y Fortalezas</h3>
+        
+        <div class="team-matchups" *ngIf="analysis.teamWeaknesses.length > 0 || analysis.teamStrengths.length > 0">
+          <!-- Debilidades -->
+          <div class="matchup-section" *ngIf="analysis.teamWeaknesses.length > 0">
+            <h4>Débil contra:</h4>
+            <div class="matchup-types">
+              <div 
+                class="type-badge weakness" 
+                *ngFor="let weakness of analysis.teamWeaknesses"
+                [style.background-color]="getTypeColor(weakness.type)">
+                <img [src]="'assets/elements/' + weakness.type + '.png'" [alt]="weakness.type">
+                {{ weakness.type | titlecase }}
+              </div>
+              
+              <p *ngIf="analysis.weakAgainst && analysis.weakAgainst.length > 0">
+                <strong>En modo {{ gameMode.toUpperCase() }}:</strong> Ten especial cuidado con tipos 
+                {{ analysis.weakAgainst.join(', ') }}.
+              </p>
+            </div>
+          </div>
+          
+          <!-- Fortalezas -->
+          <div class="matchup-section" *ngIf="analysis.teamStrengths.length > 0">
+            <h4>Fuerte contra:</h4>
+            <div class="matchup-types">
+              <div 
+                class="type-badge strength" 
+                *ngFor="let type of analysis.teamStrengths"
+                [style.background-color]="getTypeColor(type)">
+                <img [src]="'assets/elements/' + type + '.png'" [alt]="type">
+                {{ type | titlecase }}
+              </div>
+              
+              <p *ngIf="analysis.strongAgainst && analysis.strongAgainst.length > 0">
+                <strong>En modo {{ gameMode.toUpperCase() }}:</strong> Tu equipo es especialmente efectivo contra tipos 
+                {{ analysis.strongAgainst.join(', ') }}.
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="no-data" *ngIf="analysis.teamWeaknesses.length === 0 && analysis.teamStrengths.length === 0">
+          <p>Añade más Pokémon a tu equipo para ver sus fortalezas y debilidades.</p>
+        </div>
+      </div>
+      
+      <!-- Recomendaciones -->
+      <div class="analysis-card">
+        <h3>Recomendaciones para {{ gameMode === 'pve' ? 'PvE (Historia)' : 'PvP (Competitivo)' }}</h3>
+        
+        <div class="recommendations" *ngIf="analysis.recommendations.length > 0">
+          <ul class="recommendations-list">
+            <li *ngFor="let recommendation of analysis.recommendations">
+              {{ recommendation }}
+            </li>
+          </ul>
+        </div>
+        
+        <div class="no-data" *ngIf="analysis.recommendations.length === 0">
+          <p>Añade más Pokémon a tu equipo para recibir recomendaciones.</p>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Sección para estrategias avanzadas de juego competitivo -->
+    <div class="advanced-section" *ngIf="team && analysis && !isLoading">
+      <div class="section-header">
+        <h2>Estrategias Avanzadas</h2>
+      </div>
+      
+      <div class="strategy-content">
+        <!-- Resumen de estrategia basado en mecánicas de juego actuales -->
+        <div class="strategy-card">
+          <div class="strategy-icon">
+            <ion-icon name="flash-outline"></ion-icon>
+          </div>
+          <div class="strategy-info">
+            <h3>Mecánicas Clave</h3>
+            <p *ngIf="hasDynamaxCandidate()">
+              <strong>Dynamax/Gigantamax:</strong> Designa un Pokémon principal para Dinamaxizar. Durante 3 turnos, duplicará sus PS y podrá usar movimientos Max con efectos secundarios beneficiosos para todo tu equipo.
+            </p>
+            <p *ngIf="gameMode === 'pvp'">
+              <strong>Teracristalización:</strong> Permite cambiar el tipo de un Pokémon durante el combate, ganando STAB en ese tipo. Útil para potenciar ataques ofensivamente o eliminar debilidades defensivamente.
+            </p>
+          </div>
+        </div>
+        
+        <!-- Recomendaciones para el equipo actual -->
+        <div class="strategy-card">
+          <div class="strategy-icon">
+            <ion-icon name="bulb-outline"></ion-icon>
+          </div>
+          <div class="strategy-info">
+            <h3>Consejos para este Equipo</h3>
+            <ul class="strategy-recommendations">
+              <li *ngFor="let recommendation of analysis.recommendations">
+                {{ recommendation }}
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Sinergia de habilidades -->
+        <div class="strategy-card" *ngIf="team.pokemons.length > 1">
+          <div class="strategy-icon">
+            <ion-icon name="git-network-outline"></ion-icon>
+          </div>
+          <div class="strategy-info">
+            <h3>Sinergia de Habilidades</h3>
+            <p>Las habilidades pueden definir el estilo de juego de tu equipo:</p>
+            <ul class="ability-synergies">
+              <li *ngIf="hasWeatherAbility()">
+                <strong>Clima:</strong> Aprovecha las habilidades que establecen clima como Drought (Sol) o Drizzle (Lluvia) para potenciar movimientos específicos de tu equipo.
+              </li>
+              <li *ngIf="hasIntimidateUser()">
+                <strong>Intimidate:</strong> Incineroar y otros usuarios de Intimidación pueden reducir el Ataque del oponente al entrar al campo, fortaleciendo la defensa de tu equipo.
+              </li>
+              <li *ngIf="hasTailwindSupport()">
+                <strong>Control de Velocidad:</strong> Utiliza Tailwind para duplicar la velocidad de tu equipo durante 4 turnos, permitiéndote atacar primero y tomar ventaja.
+              </li>
+              <li *ngIf="hasRedirectionSupport()">
+                <strong>Redirección:</strong> Pokémon con Follow Me o Rage Powder pueden redirigir ataques hacia ellos, protegiendo a tus atacantes mientras se preparan.
+              </li>
+            </ul>
+          </div>
+        </div>
+        
+        <!-- Combinaciones meta actuales -->
+        <div class="strategy-card">
+          <div class="strategy-icon">
+            <ion-icon name="trending-up-outline"></ion-icon>
+          </div>
+          <div class="strategy-info">
+            <h3>Combinaciones Competitivas</h3>
+            <ul class="meta-combinations">
+              <li *ngIf="hasChiYuFlutterCombo()">
+                <strong>Chi-Yu + Flutter Mane:</strong> La habilidad Cuenta Ruina de Chi-Yu reduce la Defensa Especial del oponente en un 25%, maximizando el daño de Flutter Mane.
+              </li>
+              <li *ngIf="hasDondozoTatsugiriCombo()">
+                <strong>Dondozo + Tatsugiri:</strong> La habilidad Commander permite a Tatsugiri entrar en Dondozo, otorgándole +2 en todas sus estadísticas.
+              </li>
+              <li *ngIf="hasWeaknessPolicy()">
+                <strong>Weakness Policy:</strong> Activa la Policy desde tu propio equipo con ataques débiles super efectivos para dar +2 Ataque y +2 Ataque Especial al portador.
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content> 

@@ -1,0 +1,193 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Seleccionar Pokémon</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">Cancelar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Buscador -->
+  <div class="search-container">
+    <ion-searchbar 
+      [(ngModel)]="searchTerm" 
+      placeholder="Buscar por nombre o número" 
+      (ionChange)="searchPokemon()"
+      [class.active-filter]="searchTerm.trim().length > 0"
+      animated></ion-searchbar>
+  </div>
+  
+  <!-- Indicador de filtros activos -->
+  <div class="active-filters-indicator" *ngIf="hasActiveFilters()">
+    <ion-badge color="primary">
+      <ion-icon name="funnel"></ion-icon>
+      Filtros activos
+    </ion-badge>
+    
+    <div class="active-types" *ngIf="getActiveFilters().length > 0">
+      <ion-chip 
+        *ngFor="let type of getActiveFilters()" 
+        [style.background-color]="getTypeColor(type.name)"
+        class="active-filter-chip">
+        <img src="assets/elements/{{type.name}}.png" class="type-icon-small" [alt]="type.name">
+        <span class="type-name">{{ type.name | titlecase }}</span>
+        <ion-icon name="close-circle" (click)="toggleType(type)"></ion-icon>
+      </ion-chip>
+    </div>
+    
+    <div class="active-generation" *ngIf="selectedGeneration">
+      <ion-chip class="generation-chip">
+        <ion-icon name="globe-outline"></ion-icon>
+        {{ selectedGeneration.displayName }} ({{ selectedGeneration.region }})
+        <ion-icon name="close-circle" (click)="clearGenerationFilter()"></ion-icon>
+      </ion-chip>
+    </div>
+    
+    <ion-button size="small" fill="outline" (click)="clearAllFilters()" class="clear-all-btn">
+      <ion-icon name="trash-outline" slot="start"></ion-icon>
+      Limpiar todos los filtros
+    </ion-button>
+  </div>
+  
+  <!-- Filtros organizados en pestañas -->
+  <div class="filters-tabs-container">
+    <ion-segment [(ngModel)]="activeFilterTab" (ionChange)="onFilterTabChange()">
+      <ion-segment-button value="type">
+        <ion-icon name="color-palette-outline"></ion-icon>
+        <ion-label>Tipo</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="generation">
+        <ion-icon name="globe-outline"></ion-icon>
+        <ion-label>Generación</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    
+    <!-- Contenedor de filtros de tipo -->
+    <div class="filter-container" *ngIf="activeFilterTab === 'type'">
+      <div class="filter-header">
+        <h4>Filtrar por tipo</h4>
+        <ion-button size="small" fill="clear" (click)="clearTypeFilters()" [disabled]="!hasTypeFilters()">
+          Limpiar filtros de tipo
+        </ion-button>
+      </div>
+      
+      <div class="type-grid">
+        <div 
+          *ngFor="let type of pokemonTypes" 
+          class="type-chip"
+          [class.selected]="type.selected"
+          [style.background-color]="getTypeColor(type.name)"
+          (click)="toggleType(type)">
+          <img src="assets/elements/{{type.name}}.png" class="type-icon" [alt]="type.name">
+          <span class="type-name">{{ type.name | titlecase }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Contenedor de filtros de generación -->
+    <div class="filter-container" *ngIf="activeFilterTab === 'generation'">
+      <div class="filter-header">
+        <h4>Filtrar por generación</h4>
+        <ion-button size="small" fill="clear" (click)="clearGenerationFilter()" [disabled]="!selectedGeneration">
+          Limpiar filtro de generación
+        </ion-button>
+      </div>
+      
+      <div class="generation-grid">
+        <div 
+          *ngFor="let gen of pokemonGenerations" 
+          class="generation-card"
+          [class.selected]="selectedGeneration?.id === gen.id"
+          (click)="selectGeneration(gen)">
+          <div class="generation-info">
+            <span class="generation-name">{{ gen.displayName }}</span>
+            <span class="generation-region">{{ gen.region }}</span>
+            <span class="generation-range">#{{ gen.rangeStart }}-{{ gen.rangeEnd }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Resultados -->
+  <div class="results-header" *ngIf="!isLoading && !error">
+    <h4>Resultados ({{ pokemonList.length }})</h4>
+  </div>
+  
+  <!-- Cuadrícula de Pokémon -->
+  <div class="pokemon-grid-container" *ngIf="pokemonList.length > 0">
+    <div class="pokemon-grid">
+      <div 
+        *ngFor="let pokemon of pokemonList" 
+        class="pokemon-card"
+        [class.selected]="isPokemonSelected(pokemon)"
+        [class.disabled]="isPokemonSelected(pokemon)"
+        (click)="openPokemonOptions(pokemon)">
+        <div class="pokemon-card-content">
+          <div class="pokemon-id">#{{ pokemon.id }}</div>
+          <div class="pokemon-image">
+            <img [src]="getPokemonImage(pokemon)" [alt]="pokemon.name">
+          </div>
+          <div class="pokemon-info">
+            <h3>{{ cleanPokemonName(pokemon.name) | titlecase }}</h3>
+            <div class="pokemon-types">
+              <ion-badge 
+                *ngFor="let type of pokemon.types" 
+                [style.background-color]="getTypeColor(type.type.name)">
+                <img src="assets/elements/{{type.type.name}}.png" class="type-icon-mini" [alt]="type.type.name">
+                {{ type.type.name | titlecase }}
+              </ion-badge>
+            </div>
+            <div class="pokemon-forms" *ngIf="hasMegaOrGigantamax(pokemon)">
+              <ion-badge color="medium" *ngIf="hasMegaEvolution(pokemon)">
+                <ion-icon name="flash"></ion-icon>
+                Mega
+              </ion-badge>
+              <ion-badge color="danger" *ngIf="hasGigantamax(pokemon)">
+                <ion-icon name="resize"></ion-icon>
+                Gigantamax
+              </ion-badge>
+            </div>
+          </div>
+          <div class="selected-overlay" *ngIf="isPokemonSelected(pokemon)">
+            <ion-icon name="checkmark-circle"></ion-icon>
+            <span>Ya seleccionado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Mensaje de carga -->
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando Pokémon...</p>
+  </div>
+  
+  <!-- Mensaje de error -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <ion-icon name="alert-circle-outline" color="danger"></ion-icon>
+    <p>{{ error }}</p>
+    <ion-button (click)="loadInitialPokemons()" fill="outline" size="small">
+      Reintentar
+    </ion-button>
+  </div>
+  
+  <!-- Sin resultados -->
+  <div class="no-results" *ngIf="pokemonList.length === 0 && !isLoading && !error">
+    <ion-icon name="search-outline" color="medium"></ion-icon>
+    <p>No se encontraron Pokémon con los filtros seleccionados</p>
+    <ion-button (click)="clearAllFilters()" fill="outline" size="small">
+      Limpiar filtros
+    </ion-button>
+  </div>
+  
+  <!-- Infinite scroll -->
+  <ion-infinite-scroll threshold="100px" (ionInfinite)="loadMorePokemons($event)" [disabled]="hasActiveFilters() || !hasMoreData">
+    <ion-infinite-scroll-content
+      loadingSpinner="bubbles"
+      loadingText="Cargando más Pokémon...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+</ion-content> 

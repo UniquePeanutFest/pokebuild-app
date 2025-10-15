@@ -1,0 +1,335 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>{{ pokemon?.name | titlecase }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div *ngIf="error" class="error-message">
+    {{ error }}
+  </div>
+
+  <ion-card *ngIf="pokemon" [style.background-color]="getTypeColor(pokemon.types[0].type.name)">
+    <ion-img [src]="getPokemonGif()" class="pokemon-img"></ion-img>
+    <ion-card-header>
+      <ion-card-title>{{ pokemon.name | titlecase }}</ion-card-title>
+      <ion-card-subtitle>#{{ pokemon.id.toString().padStart(3, '0') }}</ion-card-subtitle>
+    </ion-card-header>
+    
+    <ion-card-content>
+      <div class="background-card-container">
+        <div class="background-card" [class.single-type]="pokemon.types.length === 1" [class.dual-type]="pokemon.types.length === 2" [class.multi-type]="pokemon.types.length > 2">
+          <div class="types-container">
+            <ion-chip *ngFor="let type of pokemon.types" 
+                      [style.background-color]="getTypeColor(type.type.name)"
+                      (click)="filtrarPorTipo(type.type.name)">
+              <img src="assets/elements/{{type.type.name}}.png" class="type-icon" [alt]="type.type.name">
+              {{ type.type.name | titlecase }}
+            </ion-chip>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-container">
+        <div class="stat-item" *ngFor="let stat of pokemon.stats">
+          <div class="stat-label">{{ stat.stat.name | titlecase }}</div>
+          <div class="stat-bar">
+            <div class="stat-fill" 
+                 [style.width.%]="getStatPercentage(stat.base_stat)"
+                 [style.background-color]="getStatColor(stat.stat.name)">
+              {{ stat.base_stat }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-section">
+        <h3>Información</h3>
+        <ion-list>
+          <ion-item>
+            <ion-label>
+              <h2>Altura</h2>
+              <p>{{ pokemon.height / 10 }} m</p>
+            </ion-label>
+          </ion-item>
+          <ion-item>
+            <ion-label>
+              <h2>Peso</h2>
+              <p>{{ pokemon.weight / 10 }} kg</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+
+      <!-- Nueva sección de debilidades -->
+      <div class="weaknesses-section">
+        <h3>Efectividad de Tipos</h3>
+        
+        <!-- Debilidades (2x) -->
+        <div class="weaknesses-group" *ngIf="typeWeaknesses.effective.length > 0">
+          <div class="weaknesses-title">Débil contra (2x)</div>
+          <div class="type-chips">
+            <ion-chip *ngFor="let type of typeWeaknesses.effective" 
+                      [style.background-color]="getTypeColor(type)"
+                      (click)="filtrarPorTipo(type)">
+              <img src="assets/elements/{{type}}.png" class="type-icon" [alt]="type">
+              {{ type | titlecase }}
+            </ion-chip>
+          </div>
+        </div>
+        
+        <!-- Super debilidades (4x) -->
+        <div class="weaknesses-group" *ngIf="typeWeaknesses.superEffective.length > 0">
+          <div class="weaknesses-title">Muy débil contra (4x)</div>
+          <div class="type-chips">
+            <ion-chip *ngFor="let type of typeWeaknesses.superEffective" 
+                      [style.background-color]="getTypeColor(type)"
+                      (click)="filtrarPorTipo(type)">
+              <img src="assets/elements/{{type}}.png" class="type-icon" [alt]="type">
+              {{ type | titlecase }}
+            </ion-chip>
+          </div>
+        </div>
+        
+        <!-- Resistencias (0.5x) -->
+        <div class="weaknesses-group" *ngIf="typeWeaknesses.resistant.length > 0">
+          <div class="weaknesses-title">Resistente a (0.5x)</div>
+          <div class="type-chips">
+            <ion-chip *ngFor="let type of typeWeaknesses.resistant" 
+                      [style.background-color]="getTypeColor(type)"
+                      (click)="filtrarPorTipo(type)">
+              <img src="assets/elements/{{type}}.png" class="type-icon" [alt]="type">
+              {{ type | titlecase }}
+            </ion-chip>
+          </div>
+        </div>
+        
+        <!-- Super resistencias (0.25x) -->
+        <div class="weaknesses-group" *ngIf="typeWeaknesses.superResistant.length > 0">
+          <div class="weaknesses-title">Muy resistente a (0.25x)</div>
+          <div class="type-chips">
+            <ion-chip *ngFor="let type of typeWeaknesses.superResistant" 
+                      [style.background-color]="getTypeColor(type)"
+                      (click)="filtrarPorTipo(type)">
+              <img src="assets/elements/{{type}}.png" class="type-icon" [alt]="type">
+              {{ type | titlecase }}
+            </ion-chip>
+          </div>
+        </div>
+        
+        <!-- Inmunidades (0x) -->
+        <div class="weaknesses-group" *ngIf="typeWeaknesses.immune.length > 0">
+          <div class="weaknesses-title">Inmune a (0x)</div>
+          <div class="type-chips">
+            <ion-chip *ngFor="let type of typeWeaknesses.immune" 
+                      [style.background-color]="getTypeColor(type)"
+                      (click)="filtrarPorTipo(type)">
+              <img src="assets/elements/{{type}}.png" class="type-icon" [alt]="type">
+              {{ type | titlecase }}
+            </ion-chip>
+          </div>
+        </div>
+      </div>
+
+      <div class="abilities-section background-card">
+        <h3>Habilidades</h3>
+        <div *ngFor="let ability of abilities" class="ability-item">
+          <ion-chip 
+            [color]="ability.is_hidden ? 'secondary' : 'primary'"
+            (click)="toggleAbilityDetails(ability)"
+            class="ability-chip">
+            {{ ability.name | titlecase }}
+            <ion-label *ngIf="ability.is_hidden">(Oculta)</ion-label>
+            <ion-icon [name]="ability.expanded ? 'chevron-up' : 'chevron-down'"></ion-icon>
+          </ion-chip>
+          
+          <div class="ability-details" *ngIf="ability.expanded">
+            <p class="ability-description">{{ ability.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nueva sección de ataques -->
+      <div class="moves-section background-card">
+        <h3>Ataques</h3>
+        <div class="moves-list">
+          <div *ngFor="let move of moves" class="move-item">
+            <div class="move-header">
+              <ion-chip [style.background-color]="getTypeColor(move.type)" class="move-type">
+                <img src="assets/elements/{{move.type}}.png" class="type-icon" [alt]="move.type">
+                {{ move.type | titlecase }}
+              </ion-chip>
+              <h4 class="move-name">{{ move.name | titlecase }}</h4>
+            </div>
+            
+            <div class="move-stats">
+              <span *ngIf="move.power !== null" class="move-stat">
+                <ion-icon name="flash-outline"></ion-icon> {{ move.power }}
+              </span>
+              <span *ngIf="move.accuracy !== null" class="move-stat">
+                <ion-icon name="eye-outline"></ion-icon> {{ move.accuracy }}%
+              </span>
+              <span *ngIf="move.pp !== null" class="move-stat">
+                <ion-icon name="repeat-outline"></ion-icon> PP: {{ move.pp }}
+              </span>
+              <span class="move-stat damage-class">
+                <ion-icon [name]="move.damage_class === 'physical' ? 'fitness-outline' : 
+                               (move.damage_class === 'special' ? 'color-wand-outline' : 'shield-outline')"></ion-icon>
+                {{ move.damage_class | titlecase }}
+        </span>
+            </div>
+            
+            <p class="move-description">{{ move.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="evolution-chain" *ngIf="evolutionChain.length > 0">
+        <h3>Cadena Evolutiva</h3>
+        <div class="evolution-stages">
+          <ng-container *ngFor="let stage of evolutionChain; let last = last; let i = index">
+            <div class="evolution-stage">
+              <div class="pokemon-evolution" 
+                   [class.current]="stage.id === pokemon.id"
+                   (click)="verDetalles(stage.name)">
+                <img [src]="getPokemonGifById(stage.id)" [alt]="stage.name">
+                <h4>{{ stage.name | titlecase }}</h4>
+                <p class="evolution-number">#{{ stage.id.toString().padStart(3, '0') }}</p>
+              </div>
+            </div>
+
+            <div class="evolution-detail" *ngIf="!last">
+              <div class="evolution-arrow">
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+              </div>
+              <div class="evolution-condition" *ngIf="evolutionChain[i+1].evolutionDetails?.condition">
+                <span>{{ evolutionChain[i+1].evolutionDetails?.condition }}</span>
+              </div>
+            </div>
+          </ng-container>
+        </div>
+
+        <!-- Mega Evoluciones -->
+        <div class="mega-evolutions" *ngIf="megaEvolutions.length > 0">
+          <h3>Mega Evoluciones</h3>
+          <div class="variant-grid" [class.single-mega]="megaEvolutions.length === 1">
+            <div class="variant-card" *ngFor="let mega of megaEvolutions" [class.single-variant]="megaEvolutions.length === 1">
+              <div class="variant-header" [class.centered-header]="megaEvolutions.length === 1">
+                <ng-container *ngIf="megaEvolutions.length === 1">
+                  <div class="variant-title single-title">
+                    <h4>{{ mega.name | titlecase }}</h4>
+                    <p class="variant-number">#{{ mega.id.toString().padStart(3, '0') }}</p>
+                  </div>
+                </ng-container>
+                <img [src]="mega.sprite" [alt]="mega.name" [class.centered-image]="megaEvolutions.length === 1">
+                <ng-container *ngIf="megaEvolutions.length > 1">
+                  <div class="variant-title">
+                    <h4>{{ mega.name | titlecase }}</h4>
+                    <p class="variant-number">#{{ mega.id.toString().padStart(3, '0') }}</p>
+                  </div>
+                </ng-container>
+              </div>
+              
+              <!-- Tipos de la Mega Evolución -->
+              <div class="variant-types">
+                <ion-chip *ngFor="let type of mega.types" 
+                         [style.background-color]="getTypeColor(type.type.name)"
+                         (click)="filtrarPorTipo(type.type.name)">
+                  <img src="assets/elements/{{type.type.name}}.png" class="type-icon" [alt]="type.type.name">
+                  {{ type.type.name | titlecase }}
+                </ion-chip>
+              </div>
+              
+              <!-- Método de Mega Evolución -->
+              <div class="evolution-method">
+                <ion-icon name="flash-outline"></ion-icon>
+                <span>{{ mega.evolution_method }}</span>
+              </div>
+              
+              <!-- Estadísticas de la Mega Evolución -->
+              <div class="variant-stats">
+                <div class="stat-mini" *ngFor="let stat of mega.stats">
+                  <div class="stat-name">{{ stat.stat.name | titlecase }}</div>
+                  <div class="stat-bar-mini">
+                    <div class="stat-fill" 
+                        [style.width.%]="getStatPercentage(stat.base_stat)"
+                        [style.background-color]="getStatColor(stat.stat.name)">
+                      {{ stat.base_stat }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Habilidades de la Mega Evolución -->
+              <div class="variant-abilities">
+                <h5>Habilidades:</h5>
+                <div *ngFor="let ability of mega.abilities" class="variant-ability">
+                  <div class="ability-name">{{ ability.name | titlecase }}</div>
+                  <div class="ability-description">{{ ability.description }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forma Gigamax -->
+        <div class="gigamax-form" *ngIf="gigamaxForm">
+          <h3>Forma Gigamax</h3>
+          <div class="variant-card">
+            <div class="variant-header">
+              <img [src]="gigamaxForm.sprite" [alt]="gigamaxForm.name">
+              <div class="variant-title">
+                <h4>{{ gigamaxForm.name | titlecase }}</h4>
+                <p class="variant-number">#{{ gigamaxForm.id.toString().padStart(3, '0') }}</p>
+              </div>
+            </div>
+            
+            <!-- Tipos del Gigantamax -->
+            <div class="variant-types">
+              <ion-chip *ngFor="let type of gigamaxForm.types" 
+                       [style.background-color]="getTypeColor(type.type.name)"
+                       (click)="filtrarPorTipo(type.type.name)">
+                <img src="assets/elements/{{type.type.name}}.png" class="type-icon" [alt]="type.type.name">
+                {{ type.type.name | titlecase }}
+              </ion-chip>
+            </div>
+            
+            <!-- Método de Gigantamax -->
+            <div class="evolution-method">
+              <ion-icon name="resize-outline"></ion-icon>
+              <span>{{ gigamaxForm.evolution_method }}</span>
+            </div>
+            
+            <!-- Estadísticas del Gigantamax -->
+            <div class="variant-stats">
+              <div class="stat-mini" *ngFor="let stat of gigamaxForm.stats">
+                <div class="stat-name">{{ stat.stat.name | titlecase }}</div>
+                <div class="stat-bar-mini">
+                  <div class="stat-fill" 
+                      [style.width.%]="getStatPercentage(stat.base_stat)"
+                      [style.background-color]="getStatColor(stat.stat.name)">
+                    {{ stat.base_stat }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Habilidades del Gigantamax -->
+            <div class="variant-abilities">
+              <h5>Habilidades:</h5>
+              <div *ngFor="let ability of gigamaxForm.abilities" class="variant-ability">
+                <div class="ability-name">{{ ability.name | titlecase }}</div>
+                <div class="ability-description">{{ ability.description }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

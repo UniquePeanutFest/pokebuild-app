@@ -1,0 +1,244 @@
+<ion-content>
+  <!-- Header con logo centrado y botón de equipos -->
+  
+
+  <!-- Barra de búsqueda independiente -->
+  <div class="search-section">
+    <div class="search-container" [class.expanded]="isSearchbarExpanded">
+      <ion-icon name="search-outline" class="search-icon" (click)="expandSearchbar()"></ion-icon>
+      <input type="text" 
+             [(ngModel)]="pokemon" 
+             placeholder="Buscar Pokémon"
+             (input)="onSearchChange($event)"
+             (focus)="expandSearchbar()"
+             (blur)="collapseSearchbar()"
+             [class.expanded]="isSearchbarExpanded"
+             class="search-input">
+    </div>
+  </div>
+
+  <!-- Sección de equipos recientes -->
+  <div class="teams-section" [class.hidden]="!showTeams">
+    <div class="section-header" (click)="toggleTeamsSection()">
+      <h2>Equipos pokemon</h2>
+      <div class="header-actions">
+        <ion-button fill="clear" size="small" class="view-all-teams" (click)="$event.stopPropagation(); goToTeams()">
+          <ion-icon name="list-outline"></ion-icon>
+          Ver todos
+        </ion-button>
+        <ion-icon [name]="showTeams ? 'chevron-up' : 'chevron-down'"></ion-icon>
+      </div>
+    </div>
+    
+    <div class="teams-container">
+      <div class="loading-teams" *ngIf="isLoadingTeams">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Loading teams...</p>
+      </div>
+      
+      <div class="empty-teams" *ngIf="!isLoadingTeams && (!teams || teams.length === 0)">
+        <p>Todavía no tienes ningún equipo!</p>
+        <ion-button expand="block" color="primary" (click)="navigateToCreateTeam()">
+          Crea tu primer equipo
+        </ion-button>
+      </div>
+      
+      <div class="teams-grid" *ngIf="!isLoadingTeams && teams && teams.length > 0">
+        <div class="team-card" *ngFor="let team of teams" (click)="viewTeamDetails(team.id)">
+          <div class="corrupt-banner" *ngIf="team.isCorrupt">
+            <ion-icon name="warning-outline"></ion-icon>
+            <span>Corrupt Team</span>
+            <ion-button fill="clear" color="danger" class="delete-button" 
+                      (click)="deleteCorruptTeam($event, team)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+          <div class="team-header">
+            <h3>{{ team.name }}</h3>
+            <span class="team-count" [class.team-complete]="getTeamPokemonCount(team) === 6">
+              {{ getTeamPokemonCount(team) }}/6 Pokémon
+            </span>
+          </div>
+          <div class="team-preview">
+            <img *ngIf="!team.isCorrupt && team.pokemons && team.pokemons.length > 0" 
+                 [src]="getFirstPokemonImage(team)" 
+                 alt="Team preview">
+            <img *ngIf="team.isCorrupt || !team.pokemons || team.pokemons.length === 0" 
+                 src="assets/img/unknown-pokemon.png" 
+                 alt="Unknown pokemon">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tipo de filtro -->
+  <div class="type-filter-button" (click)="toggleTypeFilter()">
+    <ion-icon [name]="showTypeFilter ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+    Filtrar por tipo
+    <span *ngIf="tiposSeleccionados.length > 0" class="selected-count">({{tiposSeleccionados.length}})</span>
+  </div>
+
+  <div class="type-filter-container" [class.expanded]="showTypeFilter">
+    <div class="selected-types" *ngIf="tiposSeleccionados.length > 0">
+      <ion-chip *ngFor="let type of tiposSeleccionados" 
+                [style.background-color]="type.color"
+                (click)="toggleType(type)">
+        <div class="type-icon-small">
+          <img src="assets/elements/{{type.name}}.png" alt="{{type.name}}">
+        </div>
+        {{ type.name | titlecase }}
+        <ion-icon name="close-circle" slot="end"></ion-icon>
+      </ion-chip>
+      <ion-button fill="clear" size="small" (click)="limpiarFiltros()" class="clear-filters">
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        Limpiar filtros
+      </ion-button>
+    </div>
+
+    <div class="type-grid">
+      <div class="type-circle" *ngFor="let type of pokemonTypes"
+           [class.selected]="type.selected"
+           (click)="toggleType(type)"
+           [style.background-color]="type.color">
+        <div class="type-icon">
+          <img src="assets/elements/{{type.name}}.png" alt="{{type.name}}">
+        </div>
+        <span class="type-name">{{ type.name | titlecase }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtro de generación -->
+  <div class="generation-filter-button" (click)="toggleGenerationFilter()">
+    <ion-icon [name]="showGenerationFilter ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+    Filtrar por generación
+    <span *ngIf="selectedGenerations.length > 0" class="selected-count">({{selectedGenerations.length}})</span>
+  </div>
+
+  <div class="generation-filter-container" [class.expanded]="showGenerationFilter">
+    <div class="selected-generation" *ngIf="selectedGenerations.length > 0">
+      <ion-chip class="generation-chip selected" *ngFor="let gen of selectedGenerations">
+        {{ gen.displayName }} ({{ gen.region }})
+        <ion-icon name="close-circle" (click)="$event.stopPropagation(); selectGeneration(gen)"></ion-icon>
+      </ion-chip>
+      
+      <ion-button fill="clear" size="small" (click)="clearGenerationFilter()" class="clear-filters">
+        <ion-icon name="trash-outline" slot="start"></ion-icon>
+        Limpiar filtros
+      </ion-button>
+    </div>
+
+    <div class="generation-grid">
+      <div class="generation-card" *ngFor="let gen of pokemonGenerations"
+           [class.selected]="isGenerationSelected(gen)"
+           (click)="selectGeneration(gen)">
+        <div class="generation-info">
+          <span class="generation-name">{{ gen.displayName }}</span>
+          <span class="generation-region">{{ gen.region }}</span>
+          <span class="generation-range">#{{ gen.rangeStart }}-{{ gen.rangeEnd }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="generation-filter-actions">
+    </div>
+  </div>
+
+  
+
+  <!-- Grid de Pokémon -->
+  <div class="pokemon-grid">
+    <div class="pokemon-card" *ngFor="let pokemon of pokemonList" (click)="verDetalles(pokemon.name)">
+      <div class="card-content">
+        <div class="pokemon-header">
+          <h2 class="pokemon-name">{{ pokemon.name | titlecase }}</h2>
+          <div class="pokemon-number">#{{ getPokemonId(pokemon.url).padStart(3, '0') }}</div>
+        </div>
+        <div class="pokemon-image">
+          <img [src]="getImgGif(pokemon.url)" 
+               [alt]="pokemon.name" 
+               class="pokemon-sprite"
+               (error)="handleImageError($event, pokemon.url)">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="pokemonList.length === 0 && !isLoading" class="no-results">
+    <ion-icon name="sad-outline" size="large"></ion-icon>
+    <p>No se encontraron Pokémon con los filtros seleccionados</p>
+  </div>
+
+  <!-- Loading indicator while getting initial data -->
+  <div *ngIf="isLoading && pokemonList.length === 0" class="loading-container">
+    <ion-spinner name="circles"></ion-spinner>
+    <p>Cargando Pokémon...</p>
+  </div>
+
+  <!-- Pagination Controls -->
+  <div class="pagination-container" *ngIf="shouldShowPagination()">
+    <div class="pagination-info">
+      <span>Página {{ currentPage }} de {{ totalPages }}</span>
+      <span class="total-pokemon">({{ totalPokemon }} Pokémon total)</span>
+    </div>
+    
+    <div class="pagination-controls">
+      <!-- First Page Button -->
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        [disabled]="currentPage === 1 || isLoading"
+        (click)="goToFirstPage()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+      
+      <!-- Previous Page Button -->
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        [disabled]="currentPage === 1 || isLoading"
+        (click)="goToPreviousPage()">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+      
+      <!-- Page Numbers -->
+      <div class="page-numbers">
+        <ion-button 
+          *ngFor="let page of getPageNumbers()" 
+          [fill]="page === currentPage ? 'solid' : 'clear'"
+          [color]="page === currentPage ? 'primary' : 'medium'"
+          size="small"
+          [disabled]="isLoading"
+          (click)="goToPage(page)">
+          {{ page }}
+        </ion-button>
+      </div>
+      
+      <!-- Next Page Button -->
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        [disabled]="currentPage === totalPages || isLoading"
+        (click)="goToNextPage()">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </ion-button>
+      
+      <!-- Last Page Button -->
+      <ion-button 
+        fill="clear" 
+        size="small" 
+        [disabled]="currentPage === totalPages || isLoading"
+        (click)="goToLastPage()">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </ion-button>
+    </div>
+  </div>
+  
+  <!-- Small loading indicator at the bottom when loading -->
+  <div *ngIf="isLoading && pokemonList.length > 0" class="bottom-loading">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+  </div>
+</ion-content>

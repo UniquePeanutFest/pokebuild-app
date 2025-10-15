@@ -1,0 +1,94 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mis Equipos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Loading Indicator -->
+  <div class="loading-container" *ngIf="isLoading">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando tus equipos...</p>
+  </div>
+
+  <!-- Error Message -->
+  <div class="error-container" *ngIf="error && !isLoading">
+    <ion-icon name="alert-circle-outline"></ion-icon>
+    <p>{{ error }}</p>
+    <ion-button (click)="loadTeams()">Reintentar</ion-button>
+  </div>
+
+  <!-- Teams List -->
+  <div class="teams-container" *ngIf="!isLoading && !error">
+    <!-- Teams Header -->
+    <div class="teams-header" *ngIf="teams.length > 0">
+      <h2>Mis equipos Pokémon</h2>
+      <span class="team-count-badge">{{ teams.length }} equipo<span *ngIf="teams.length !== 1">s</span></span>
+    </div>
+
+    <!-- Teams Grid -->
+    <div class="teams-grid" *ngIf="teams.length > 0">
+      <div class="team-card" *ngFor="let team of teams" 
+           (click)="viewTeamDetails(team.id)"
+           (press)="showContextMenu($event, team)"
+           (contextmenu)="showContextMenu($event, team); $event.preventDefault()">
+        <div class="team-image">
+          <img [src]="getFirstPokemonImage(team)" alt="Imagen del equipo">
+        </div>
+        <div class="team-info">
+          <h3>{{ team.name }}</h3>
+          <div class="team-meta">
+            <span class="team-count" [class.team-complete]="getTeamPokemonCount(team) === '6/6'">
+              {{ getTeamPokemonCount(team) }}
+            </span>
+            <span class="team-date">
+              Actualizado: {{ team.updatedAt | date:'dd/MM/yy' }}
+            </span>
+          </div>
+          <span class="game-mode-badge" 
+                [style.background-color]="team.gameMode === 'pvp' ? '#dc0a2d' : '#3880ff'"
+                [style.color]="'white'">
+            {{ team.gameMode === 'pvp' ? 'PvP' : 'PvE' }}
+          </span>
+        </div>
+        <div class="team-tip" *ngIf="teams.length > 0">
+          <ion-icon name="information-circle-outline"></ion-icon>
+          <span>Mantén pulsado para más opciones</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-teams" *ngIf="teams.length === 0">
+      <ion-icon name="paw-outline"></ion-icon>
+      <h3>¡No tienes equipos aún!</h3>
+      <p>Crea tu primer equipo de Pokémon para comenzar</p>
+      <ion-button expand="block" (click)="createTeam()">
+        <ion-icon name="add-outline" slot="start"></ion-icon>
+        Crear mi primer equipo
+      </ion-button>
+    </div>
+  </div>
+  
+  <!-- Floating action button for creating teams (only shown when there are teams) -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="teams && teams.length > 0">
+    <ion-fab-button (click)="createTeam()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- Context Menu -->
+  <div class="context-menu" *ngIf="showMenu" [style.top.px]="menuY" [style.left.px]="menuX">
+    <div class="menu-item" (click)="editTeamName(selectedTeam)">
+      <ion-icon name="create-outline"></ion-icon>
+      <span>Editar nombre</span>
+    </div>
+    <div class="menu-item delete" (click)="confirmDeleteTeam(selectedTeam)">
+      <ion-icon name="trash-outline"></ion-icon>
+      <span>Eliminar equipo</span>
+    </div>
+  </div>
+</ion-content> 
