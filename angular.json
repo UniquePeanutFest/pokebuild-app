@@ -54,7 +54,8 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "baseHref": "/pokebuild-app/"
             },
             "development": {
               "buildOptimizer": false,
