@@ -10,6 +10,9 @@
 # Dependencies
 /node_modules
 
+# Angular cache
+/.angular
+
 # Profiling files
 chrome-profiler-events*.json
 speed-measure-plugin*.json
