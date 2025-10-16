@@ -1,6 +1,6 @@
 <ion-app>
   <div style="background-color: black; height: 24px; width: 100%;"></div>
-  <ion-header>
+  <ion-header style="z-index: 100;" [style.display]="isTeamDetailsPage ? 'none' : 'block'">
     <ion-toolbar>
       <ion-buttons slot="start">
         <ion-button routerLink="/home">

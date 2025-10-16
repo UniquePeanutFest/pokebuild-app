@@ -9,6 +9,8 @@ import { PokemonSelectorModalComponent } from '../pokemon-selector-modal/pokemon
 import { ConfirmActionModalComponent } from '../confirm-action-modal/confirm-action-modal.component';
 import { SelectedPokemonInfo } from '../pokemon-selector-modal/pokemon-selector-modal.component';
 import { ItemSelectorModalComponent } from '../../item-selector-modal/item-selector-modal.component';
+import { slideInFromRight, slideOutToRight, modalEnterAnimation, modalLeaveAnimation } from '../../shared/animations/modal-animations';
+import { ExportTeamModalComponent } from '../../shared/modals/export-team-modal/export-team-modal.component';
 
 // Extender la interfaz TeamAnalysis para nuestras necesidades específicas
 interface ExtendedTeamAnalysis extends TeamAnalysis {
@@ -40,6 +42,7 @@ export class TeamDetailsComponent implements OnInit {
   gameMode: 'pve' | 'pvp' = 'pve';
   emptySlots: number[] = [];
   recentlyAddedPokemon: PokemonDetail | null = null;
+  recentlyAddedMegaPokemon: PokemonDetail | null = null;
   
   // Objeto para ser usado en template
   Object = Object;
@@ -290,18 +293,25 @@ export class TeamDetailsComponent implements OnInit {
       return;
     }
     
-    const modal = await this.modalCtrl.create({
-      component: PokemonSelectorModalComponent,
-      componentProps: {
-        selectedPokemons: this.team.pokemons.map(p => p.pokemon) // Pasar solo los Pokémon base para la validación
+    try {
+      const modal = await this.modalCtrl.create({
+        component: PokemonSelectorModalComponent,
+        componentProps: {
+          selectedPokemons: this.team.pokemons.map(p => p.pokemon) // Pasar solo los Pokémon base para la validación
+        }
+        // Temporalmente sin animaciones personalizadas para evitar conflictos de aria-hidden
+        // enterAnimation: modalEnterAnimation,
+        // leaveAnimation: modalLeaveAnimation
+      });
+      
+      await modal.present();
+      
+      const { data } = await modal.onDidDismiss();
+      if (data) {
+        await this.addPokemonToTeam(data);
       }
-    });
-    
-    await modal.present();
-    
-    const { data } = await modal.onDidDismiss();
-    if (data) {
-      await this.addPokemonToTeam(data);
+    } catch (error) {
+      console.error('Error al abrir modal:', error);
     }
   }
 
@@ -317,6 +327,15 @@ export class TeamDetailsComponent implements OnInit {
       if (this.team && this.team.pokemons.length > 0) {
         const lastPokemon = this.team.pokemons[this.team.pokemons.length - 1];
         this.recentlyAddedPokemon = lastPokemon.pokemon;
+        
+        // Si es una mega-evolución, mantener el estado visual por más tiempo
+        if (lastPokemon.form === 'mega') {
+          this.recentlyAddedMegaPokemon = lastPokemon.pokemon;
+          setTimeout(() => {
+            this.recentlyAddedMegaPokemon = null;
+          }, 3000); // 3 segundos para mega-evoluciones
+        }
+        
         setTimeout(() => {
           this.recentlyAddedPokemon = null;
         }, 1000);
@@ -704,6 +723,9 @@ export class TeamDetailsComponent implements OnInit {
         pokemon: pokemon,
         currentItem: pokemon.item || null
       }
+      // Temporalmente sin animaciones personalizadas para evitar conflictos de aria-hidden
+      // enterAnimation: slideInFromRight,
+      // leaveAnimation: slideOutToRight
     });
 
     await modal.present();
@@ -726,6 +748,25 @@ export class TeamDetailsComponent implements OnInit {
     
     // Guardar el equipo actualizado
     this.saveTeam();
+  }
+
+  // Verificar si un Pokémon es una mega-evolución
+  isMegaEvolution(pokemon: PokemonDetail): boolean {
+    if (!pokemon) return false;
+    
+    // Buscar el teamPokemon correspondiente para verificar la forma
+    if (this.team) {
+      const teamPokemon = this.team.pokemons.find(tp => tp.pokemon.id === pokemon.id);
+      if (teamPokemon && teamPokemon.form === 'mega') {
+        return true;
+      }
+    }
+    
+    // Fallback: verificar por nombre
+    const pokemonName = pokemon.name.toLowerCase();
+    return pokemonName.includes('mega') || 
+           pokemonName.includes('mega-x') || 
+           pokemonName.includes('mega-y');
   }
 
   updatePokemonStats(pokemon: PokemonDetail) {
@@ -799,6 +840,35 @@ export class TeamDetailsComponent implements OnInit {
       } catch (e) {
         console.error('Error al guardar el equipo:', e);
       }
+    }
+  }
+
+  async openExportModal() {
+    if (!this.team) return;
+
+    try {
+      const modal = await this.modalCtrl.create({
+        component: ExportTeamModalComponent,
+        componentProps: {
+          team: this.team
+        },
+        backdropDismiss: true,
+        showBackdrop: true,
+        cssClass: 'export-modal'
+      });
+
+      await modal.present();
+    } catch (error) {
+      console.error('Error al abrir modal de exportación:', error);
+      
+      const toast = await this.toastCtrl.create({
+        message: 'Error al abrir modal de exportación',
+        duration: 2000,
+        position: 'bottom',
+        color: 'danger'
+      });
+      
+      await toast.present();
     }
   }
 } 

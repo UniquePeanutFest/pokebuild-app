@@ -1,0 +1,63 @@
+<ng-container *ngFor="let item of skeletonItems">
+  <div class="skeleton-container" 
+       [class]="'skeleton-' + type"
+       [style.height]="height"
+       [style.width]="width"
+       [style.border-radius]="borderRadius">
+    
+    <!-- Skeleton para tarjeta de Pokémon -->
+    <div *ngIf="type === 'pokemon-card'" class="skeleton-pokemon-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-content">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-subtitle"></div>
+        <div class="skeleton-chips">
+          <div class="skeleton-chip"></div>
+          <div class="skeleton-chip"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Skeleton para lista de Pokémon -->
+    <div *ngIf="type === 'pokemon-list'" class="skeleton-pokemon-list">
+      <div class="skeleton-avatar"></div>
+      <div class="skeleton-text">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>
+
+    <!-- Skeleton para tarjeta de equipo -->
+    <div *ngIf="type === 'team-card'" class="skeleton-team-card">
+      <div class="skeleton-header">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-badge"></div>
+      </div>
+      <div class="skeleton-pokemon-grid">
+        <div class="skeleton-pokemon-mini" *ngFor="let i of [1,2,3,4,5,6]"></div>
+      </div>
+    </div>
+
+    <!-- Skeleton para lista de items -->
+    <div *ngIf="type === 'item-list'" class="skeleton-item-list">
+      <div class="skeleton-icon"></div>
+      <div class="skeleton-text">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+      </div>
+    </div>
+
+    <!-- Skeleton para stats -->
+    <div *ngIf="type === 'stats'" class="skeleton-stats">
+      <div class="skeleton-stat" *ngFor="let i of [1,2,3,4,5,6]">
+        <div class="skeleton-stat-label"></div>
+        <div class="skeleton-stat-bar"></div>
+      </div>
+    </div>
+
+    <!-- Skeleton personalizado -->
+    <div *ngIf="type === 'custom'" class="skeleton-custom">
+      <div class="skeleton-shimmer"></div>
+    </div>
+  </div>
+</ng-container>

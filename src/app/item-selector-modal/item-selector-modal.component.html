@@ -48,6 +48,12 @@
     <p>{{ error }}</p>
   </div>
 
+  <!-- Mensaje para mega-evoluciones -->
+  <div *ngIf="isMegaEvolution" class="mega-evolution-warning">
+    <ion-icon name="flash-outline" color="warning"></ion-icon>
+    <p>Este Pokémon es una mega-evolución y no puede equipar items</p>
+  </div>
+
   <!-- Lista de objetos -->
   <ion-list *ngIf="!isLoading && !error && filteredItems.length > 0">
     <ion-item *ngFor="let item of filteredItems" 

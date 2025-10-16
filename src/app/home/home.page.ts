@@ -8,6 +8,8 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { PokemonTeam, TeamsService } from '../Services/teams.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SkeletonLoaderComponent } from '../shared/skeleton-loader/skeleton-loader.component';
+import { ProgressIndicatorComponent } from '../shared/progress-indicator/progress-indicator.component';
 
 @Component({
   selector: 'app-home',
@@ -18,7 +20,9 @@ import { FormsModule } from '@angular/forms';
     CommonModule,
     FormsModule,
     RouterLink,
-    IonicModule
+    IonicModule,
+    SkeletonLoaderComponent,
+    ProgressIndicatorComponent
   ]
 })
 export class HomePage implements OnInit, OnDestroy {
@@ -49,6 +53,9 @@ export class HomePage implements OnInit, OnDestroy {
   teams: PokemonTeam[] = [];
   isLoadingTeams: boolean = false;
   showTeams: boolean = true;
+  
+  // Progreso de carga
+  loadingProgress: number = 0;
   private searchSubject = new Subject<string>();
   private searchSubscription?: Subscription;
   searchTimeout: any;
@@ -118,8 +125,11 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   async cargarPokemons() {
+    let progressInterval: any = null;
+    
     try {
       this.isLoading = true;
+      this.loadingProgress = 0;
       
       // Reset pagination when starting a new search
       if (this.offset === 0) {
@@ -127,6 +137,13 @@ export class HomePage implements OnInit, OnDestroy {
         this.hasReachedEnd = false;
         this.pokemonList = [];
       }
+      
+      // Simular progreso de carga
+      progressInterval = setInterval(() => {
+        if (this.loadingProgress < 90) {
+          this.loadingProgress += Math.random() * 20;
+        }
+      }, 100);
       
       // Scroll to top when starting a new search/filter
       if (this.offset === 0 && !this.selectedGenerations.length && !this.tiposSeleccionados.length) {
@@ -187,10 +204,24 @@ export class HomePage implements OnInit, OnDestroy {
         // Always replace the list for pagination (no infinite scroll)
         this.pokemonList = response.results;
       }
+      
+      // Completar el progreso
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
+      this.loadingProgress = 100;
+      
+      // Pequeño delay para mostrar el 100%
+      setTimeout(() => {
+        this.isLoading = false;
+      }, 300);
+      
     } catch (error) {
       console.error('Error cargando pokémon', error);
       this.mensajeError = 'Error al cargar los Pokémon';
-    } finally {
+      if (progressInterval) {
+        clearInterval(progressInterval);
+      }
       this.isLoading = false;
     }
   }

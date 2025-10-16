@@ -172,8 +172,24 @@
 
   <!-- Loading indicator while getting initial data -->
   <div *ngIf="isLoading && pokemonList.length === 0" class="loading-container">
-    <ion-spinner name="circles"></ion-spinner>
-    <p>Cargando Pokémon...</p>
+    <app-progress-indicator
+      [progress]="loadingProgress"
+      [total]="100"
+      type="circular"
+      size="large"
+      color="primary"
+      text="Cargando Pokémon..."
+      [showPercentage]="true">
+    </app-progress-indicator>
+  </div>
+
+  <!-- Skeleton loaders -->
+  <div class="skeleton-loading" *ngIf="isLoading && pokemonList.length === 0">
+    <app-skeleton-loader 
+      type="pokemon-card" 
+      [count]="6"
+      class="skeleton-grid">
+    </app-skeleton-loader>
   </div>
 
   <!-- Pagination Controls -->
@@ -208,7 +224,6 @@
         <ion-button 
           *ngFor="let page of getPageNumbers()" 
           [fill]="page === currentPage ? 'solid' : 'clear'"
-          [color]="page === currentPage ? 'primary' : 'medium'"
           size="small"
           [disabled]="isLoading"
           (click)="goToPage(page)">

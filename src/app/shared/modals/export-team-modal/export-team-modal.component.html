@@ -1,0 +1,173 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Exportar Equipo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="export-modal-content">
+  <div class="export-container">
+    <!-- Vista previa del equipo -->
+    <div class="preview-section">
+      <h3>Vista Previa del Equipo</h3>
+      <div class="team-preview-container">
+        <div #teamPreview class="team-preview" [class.export-mode]="true">
+          <!-- Header del equipo -->
+          <div class="team-header">
+            <h2 class="team-name">{{ team?.name }}</h2>
+            <div class="team-info">
+              <span class="game-mode" [class]="'mode-' + team?.gameMode">
+                {{ team?.gameMode === 'pve' ? 'PvE (Historia)' : 'PvP (Competitivo)' }}
+              </span>
+              <span class="pokemon-count">{{ (team?.pokemons?.length || 0) }}/6 Pokémon</span>
+            </div>
+          </div>
+
+          <!-- Grid de Pokémon -->
+          <div class="pokemon-grid">
+            <div 
+              *ngFor="let teamPokemon of team?.pokemons; let i = index" 
+              class="pokemon-card export-card"
+            >
+              <!-- Imagen del Pokémon -->
+              <div class="pokemon-image-container">
+                <img 
+                  [src]="getPokemonImageUrl(teamPokemon)" 
+                  [alt]="getPokemonDisplayName(teamPokemon)"
+                  class="pokemon-image"
+                />
+                <!-- Indicador de forma especial -->
+                <div class="form-indicator" *ngIf="teamPokemon.form !== 'normal'">
+                  <span class="form-badge" [class]="'form-' + teamPokemon.form">
+                    {{ teamPokemon.form === 'mega' ? 'MEGA' : 'GMAX' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Información del Pokémon -->
+              <div class="pokemon-info">
+                <h4 class="pokemon-name">{{ getPokemonDisplayName(teamPokemon) }}</h4>
+                
+                <!-- Tipos -->
+                <div class="pokemon-types">
+                  <span 
+                    *ngFor="let type of getPokemonTypes(teamPokemon)" 
+                    class="type-badge"
+                    [style.background-color]="getTypeColor(type.type.name)"
+                  >
+                    {{ type.type.name | titlecase }}
+                  </span>
+                </div>
+
+                <!-- Stats principales -->
+                <div class="pokemon-stats">
+                  <div class="stat-item">
+                    <span class="stat-label">HP:</span>
+                    <span class="stat-value">{{ getPokemonStat(teamPokemon, 'hp') }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">ATK:</span>
+                    <span class="stat-value">{{ getPokemonStat(teamPokemon, 'attack') }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">DEF:</span>
+                    <span class="stat-value">{{ getPokemonStat(teamPokemon, 'defense') }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">SPD:</span>
+                    <span class="stat-value">{{ getPokemonStat(teamPokemon, 'speed') }}</span>
+                  </div>
+                </div>
+
+                <!-- Item si existe -->
+                <div class="pokemon-item" *ngIf="teamPokemon.pokemon.item">
+                  <div class="item-content">
+                    <img 
+                      [src]="teamPokemon.pokemon.item.sprites.default" 
+                      class="item-icon"
+                      *ngIf="teamPokemon.pokemon.item.sprites?.default"
+                    >
+                    <span class="item-name">{{ getItemName(teamPokemon.pokemon.item) }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slots vacíos -->
+            <div 
+              *ngFor="let emptySlot of getEmptySlots()" 
+              class="pokemon-card empty-slot export-card"
+            >
+              <div class="empty-slot-content">
+                <ion-icon name="add-circle-outline" class="empty-icon"></ion-icon>
+                <span class="empty-text">Slot vacío</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Opciones de exportación -->
+    <div class="export-options">
+      <h3>Opciones de Exportación</h3>
+      
+      <ion-list>
+        <!-- Formato de imagen -->
+        <ion-item>
+          <ion-label>Formato de imagen</ion-label>
+          <ion-select 
+            [(ngModel)]="exportFormat" 
+            interface="popover"
+            [disabled]="isExporting"
+          >
+            <ion-select-option value="png">PNG (Recomendado)</ion-select-option>
+            <ion-select-option value="jpg">JPG</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Calidad (solo para JPG) -->
+        <ion-item *ngIf="exportFormat === 'jpg'">
+          <ion-label>Calidad</ion-label>
+          <ion-range 
+            [(ngModel)]="exportQuality" 
+            min="0.1" 
+            max="1" 
+            step="0.1"
+            [disabled]="isExporting"
+          >
+            <ion-label slot="start">Baja</ion-label>
+            <ion-label slot="end">Alta</ion-label>
+          </ion-range>
+          <ion-note slot="end">{{ (exportQuality * 100).toFixed(0) }}%</ion-note>
+        </ion-item>
+      </ion-list>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismiss()" [disabled]="isExporting">
+        Cancelar
+      </ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button 
+        (click)="exportTeam()" 
+        [disabled]="isExporting || !team"
+        color="primary"
+        fill="solid"
+      >
+        <ion-spinner *ngIf="isExporting" name="crescent" slot="start"></ion-spinner>
+        <ion-icon *ngIf="!isExporting" name="download" slot="start"></ion-icon>
+        {{ isExporting ? 'Exportando...' : 'Exportar' }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

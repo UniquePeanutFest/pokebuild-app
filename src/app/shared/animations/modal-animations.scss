@@ -1,0 +1,103 @@
+// Animaciones CSS para modales - alternativa más compatible
+.modal-enter-animation {
+  .modal-wrapper {
+    animation: modalEnter 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  ion-backdrop {
+    animation: backdropEnter 0.3s ease-out;
+  }
+}
+
+.modal-leave-animation {
+  .modal-wrapper {
+    animation: modalLeave 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  ion-backdrop {
+    animation: backdropLeave 0.2s ease-in;
+  }
+}
+
+@keyframes modalEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes modalLeave {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+}
+
+@keyframes backdropEnter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: var(--backdrop-opacity);
+  }
+}
+
+@keyframes backdropLeave {
+  from {
+    opacity: var(--backdrop-opacity);
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+// Animación de slide para modales de items
+.slide-enter-animation {
+  .modal-wrapper {
+    animation: slideInRight 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  ion-backdrop {
+    animation: backdropEnter 0.3s ease-out;
+  }
+}
+
+.slide-leave-animation {
+  .modal-wrapper {
+    animation: slideOutRight 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  ion-backdrop {
+    animation: backdropLeave 0.2s ease-in;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}

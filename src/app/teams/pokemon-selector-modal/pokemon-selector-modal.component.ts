@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PokemonService, PokemonDetail, PokemonTypeFilter, PokemonGeneration, PokemonVariant } from '../../Services/pokemon.service';
 import { firstValueFrom } from 'rxjs';
+import { modalEnterAnimation, modalLeaveAnimation } from '../../shared/animations/modal-animations';
 
 // Interfaz para Pokémon seleccionado con información adicional
 export interface SelectedPokemonInfo {

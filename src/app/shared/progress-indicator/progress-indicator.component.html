@@ -1,0 +1,54 @@
+<div class="progress-indicator" [class]="'progress-' + type + ' progress-' + size">
+  
+  <!-- Indicador lineal -->
+  <div *ngIf="type === 'linear'" class="progress-linear">
+    <div class="progress-bar-container">
+      <div class="progress-bar" 
+           [style.width.%]="percentage"
+           [class]="'progress-' + color">
+        <div class="progress-bar-fill" *ngIf="animated"></div>
+      </div>
+    </div>
+    <div class="progress-text" *ngIf="showText || showPercentage">
+      <span *ngIf="progressText" class="progress-label">{{ progressText }}</span>
+      <span *ngIf="showPercentage" class="progress-percentage">{{ percentageText }}</span>
+    </div>
+  </div>
+
+  <!-- Indicador circular -->
+  <div *ngIf="type === 'circular'" class="progress-circular">
+    <div class="progress-circle-container">
+      <svg class="progress-circle" viewBox="0 0 100 100">
+        <circle class="progress-circle-bg" cx="50" cy="50" r="45"></circle>
+        <circle class="progress-circle-fill" 
+                cx="50" 
+                cy="50" 
+                r="45"
+                [style.stroke-dasharray]="283"
+                [style.stroke-dashoffset]="283 - (283 * percentage / 100)"
+                [class]="'progress-' + color">
+        </circle>
+      </svg>
+      <div class="progress-circle-text">
+        <span *ngIf="showPercentage" class="progress-percentage">{{ percentageText }}</span>
+        <span *ngIf="progressText" class="progress-label">{{ progressText }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Indicador de puntos -->
+  <div *ngIf="type === 'dots'" class="progress-dots">
+    <div class="dots-container">
+      <div class="dot" 
+           *ngFor="let dot of [1,2,3,4,5]" 
+           [class.active]="percentage >= (dot * 20)"
+           [class]="'progress-' + color">
+      </div>
+    </div>
+    <div class="progress-text" *ngIf="showText || showPercentage">
+      <span *ngIf="progressText" class="progress-label">{{ progressText }}</span>
+      <span *ngIf="showPercentage" class="progress-percentage">{{ percentageText }}</span>
+    </div>
+  </div>
+
+</div>

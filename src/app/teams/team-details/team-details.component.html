@@ -19,14 +19,17 @@
         <ion-icon name="close"></ion-icon>
       </ion-button>
     </div>
-    <ion-buttons slot="end" *ngIf="!isEditing && team">
-      <ion-button (click)="goToHomePage()" class="home-button">
+    <ion-buttons slot="end">
+      <ion-button (click)="goToHomePage()" class="home-button" *ngIf="!isEditing && team">
         <ion-icon name="home"></ion-icon>
       </ion-button>
-      <ion-button (click)="editTeamName()">
+      <ion-button (click)="openExportModal()" class="export-button" [attr.aria-hidden]="false">
+        <ion-icon name="download"></ion-icon>
+      </ion-button>
+      <ion-button (click)="editTeamName()" *ngIf="!isEditing && team">
         <ion-icon name="create-outline"></ion-icon>
       </ion-button>
-      <ion-button (click)="confirmDeleteTeam()">
+      <ion-button (click)="confirmDeleteTeam()" *ngIf="!isEditing && team">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -50,16 +53,14 @@
   <div class="team-content" *ngIf="team && !isLoading && !error">
     <!-- Sección de Pokémon del equipo -->
     <div class="pokemon-section" *ngIf="team">
-      <h2>{{ team.name }} <span class="game-mode-badge" [class.pve]="gameMode === 'pve'" [class.pvp]="gameMode === 'pvp'">{{gameMode === 'pve' ? 'PvE' : 'PvP'}}</span></h2>
-      
       <!-- Control de modo de juego -->
       <div class="game-mode-selector">
         <ion-segment [(ngModel)]="gameMode" (ionChange)="updateGameMode()">
           <ion-segment-button value="pve" class="mode-pve">
-            <ion-label>PvE</ion-label>
+            <ion-label>PvE (Historia)</ion-label>
           </ion-segment-button>
           <ion-segment-button value="pvp" class="mode-pvp">
-            <ion-label>PvP</ion-label>
+            <ion-label>PvP (Competitivo)</ion-label>
           </ion-segment-button>
         </ion-segment>
       </div>
@@ -154,15 +155,23 @@
           </div>
           
           <!-- Botón para añadir objeto -->
-          <ion-button class="add-item-button" expand="block" fill="clear" (click)="openItemSelectorModal(teamPokemon.pokemon)" *ngIf="!teamPokemon.pokemon.item">
+          <ion-button class="add-item-button" expand="block" fill="clear" 
+                      (click)="openItemSelectorModal(teamPokemon.pokemon)" 
+                      [disabled]="isMegaEvolution(teamPokemon.pokemon)"
+                      [class.mega-evolution-highlight]="recentlyAddedMegaPokemon?.id === teamPokemon.pokemon.id"
+                      *ngIf="!teamPokemon.pokemon.item">
             <ion-icon name="add-circle-outline" slot="start"></ion-icon>
-            <span>Añadir Item</span>
+            <span>{{ isMegaEvolution(teamPokemon.pokemon) ? 'MEGA-EVOLUCIÓN (SIN ITEM)' : 'Añadir Item' }}</span>
           </ion-button>
           
           <!-- Botón para cambiar objeto si ya existe -->
-          <ion-button class="change-item-button" expand="block" fill="clear" (click)="openItemSelectorModal(teamPokemon.pokemon)" *ngIf="teamPokemon.pokemon.item">
+          <ion-button class="change-item-button" expand="block" fill="clear" 
+                      (click)="openItemSelectorModal(teamPokemon.pokemon)" 
+                      [disabled]="isMegaEvolution(teamPokemon.pokemon)"
+                      [class.mega-evolution-highlight]="recentlyAddedMegaPokemon?.id === teamPokemon.pokemon.id"
+                      *ngIf="teamPokemon.pokemon.item">
             <ion-icon name="swap-horizontal-outline" slot="start"></ion-icon>
-            <span>Cambiar Item</span>
+            <span>{{ isMegaEvolution(teamPokemon.pokemon) ? 'MEGA-EVOLUCIÓN (SIN ITEM)' : 'Cambiar Item' }}</span>
           </ion-button>
         </div>
         
