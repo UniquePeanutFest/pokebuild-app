@@ -19,10 +19,10 @@ jobs:
         cache: 'npm'
         
     - name: Install dependencies
-      run: npm install
+      run: npm install --legacy-peer-deps
       
     - name: Build
-      run: npm run build
+      run: npm run build:prod
       
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
